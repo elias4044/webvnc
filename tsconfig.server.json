@@ -9,7 +9,8 @@
     "allowImportingTsExtensions": false,
     "noEmit": false,
     "paths": {
-      "@server/*": ["src/server/*"]
+      "@server/*": ["src/server/*"],
+      "@fastify/static": ["./node_modules/@fastify/static/types/index.d.ts"]
     }
   },
   "include": ["src/server/**/*.ts"],

@@ -248,6 +248,10 @@ function Build-WebVNC {
 
     Push-Location $Root
     try {
+        # Use Continue so that npm's stderr warnings (written via Write-Error in npm.ps1)
+        # do not trigger a terminating error under $ErrorActionPreference = 'Stop'.
+        # Failures are detected via $LASTEXITCODE instead.
+        $local:ErrorActionPreference = 'Continue'
         & $npm install --prefer-offline 2>&1 | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
         if ($LASTEXITCODE -ne 0) { throw "npm install exited with code $LASTEXITCODE" }
         Write-OK 'Dependencies installed.'
