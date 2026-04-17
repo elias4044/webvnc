@@ -20,7 +20,7 @@ npm run dev
 ```
 
 The Vite dev server runs on **http://localhost:5173** and proxies API calls
-to the Fastify server on **http://localhost:3000**.
+to the Fastify server on **http://localhost:3020**.
 
 ## Scripts
 

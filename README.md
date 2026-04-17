@@ -89,7 +89,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Open **http://localhost:5173** and fill in the connection form.
+Open **http://localhost:3020** and fill in the connection form.
 
 For a fast first test without any VNC server, set the host/port to an existing RealVNC,
 TigerVNC, or UltraVNC machine on your network. See the next section for how to set
@@ -260,7 +260,7 @@ cp .env.example .env
 |------------------------|---------------|-----------------------------------------------------------|
 | `NODE_ENV`             | `development` | `development` / `production` / `test`                    |
 | `HOST`                 | `0.0.0.0`     | Bind address for the WebVNC HTTP server                   |
-| `PORT`                 | `3000`        | HTTP port for the WebVNC server                           |
+| `PORT`                 | `3020`        | HTTP port for the WebVNC server                           |
 | `LOG_LEVEL`            | `info`        | Pino log level (`trace` `debug` `info` `warn` `error`)   |
 | `CORS_ORIGIN`          | `*`           | Allowed CORS origin. Set to your domain in production     |
 | `RATE_LIMIT_MAX`       | `100`         | Maximum requests per window per IP                        |
@@ -282,7 +282,7 @@ The `/vnc.html` viewer page accepts all connection settings as URL query paramet
 This is useful for bookmarks, deep links, kiosk setups, or embedding.
 
 ```
-http://localhost:3000/vnc.html?host=myserver&port=6080&encrypt=false&autoConnect=true
+http://localhost:3020/vnc.html?host=myserver&port=6080&encrypt=false&autoConnect=true
 ```
 
 | Parameter          | Type    | Default     | Description                                    |
@@ -296,7 +296,7 @@ http://localhost:3000/vnc.html?host=myserver&port=6080&encrypt=false&autoConnect
 | `viewOnly`         | boolean | `false`     | Disable keyboard/mouse input                   |
 | `autoConnect`      | boolean | `false`     | Connect immediately on page load               |
 | `reconnect`        | boolean | `false`     | Auto-reconnect on unexpected disconnect        |
-| `reconnectDelay`   | number  | `3000`      | Delay before reconnect attempt (ms)            |
+| `reconnectDelay`   | number  | `3020`      | Delay before reconnect attempt (ms)            |
 | `repeaterId`       | string  | —           | UltraVNC repeater ID                           |
 | `qualityLevel`     | number  | `6`         | JPEG quality 0–9 (0 = lossless)                |
 | `compressionLevel` | number  | `2`         | Zlib compression 0–9                           |
@@ -328,7 +328,7 @@ npm run build
 npm start
 ```
 
-The server listens on `HOST:PORT` (default `0.0.0.0:3000`).
+The server listens on `HOST:PORT` (default `0.0.0.0:3020`).
 
 **Recommended nginx reverse proxy config:**
 
@@ -341,7 +341,7 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/vnc.example.com/privkey.pem;
 
     location / {
-        proxy_pass         http://127.0.0.1:3000;
+        proxy_pass         http://127.0.0.1:3020;
         proxy_http_version 1.1;
         proxy_set_header   Upgrade $http_upgrade;
         proxy_set_header   Connection "upgrade";
@@ -371,7 +371,7 @@ docker compose logs -f
 docker compose down
 ```
 
-The compose file exposes port `3000` (HTTP) and `6080` (built-in websockify bridge).
+The compose file exposes port `3020` (HTTP) and `6080` (built-in websockify bridge).
 Set VNC target host/port via environment variables in `.env` or directly in
 `docker-compose.yml`.
 
@@ -554,7 +554,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env`:
 |------------------------|-----------------|--------------------------------------------------|
 | `NODE_ENV`             | `development`   | `development` / `production` / `test`            |
 | `HOST`                 | `0.0.0.0`       | Bind address                                     |
-| `PORT`                 | `3000`          | HTTP port                                        |
+| `PORT`                 | `3020`          | HTTP port                                        |
 | `LOG_LEVEL`            | `info`          | Pino log level                                   |
 | `CORS_ORIGIN`          | `*`             | Allowed CORS origin(s)                           |
 | `RATE_LIMIT_MAX`       | `100`           | Max requests per window                          |
@@ -621,7 +621,7 @@ useful for deep-linking or embedding:
 | `viewOnly`         | boolean | `false`     |
 | `autoConnect`      | boolean | `false`     |
 | `reconnect`        | boolean | `false`     |
-| `reconnectDelay`   | number  | `3000`      |
+| `reconnectDelay`   | number  | `3020`      |
 | `repeaterId`       | string  | —           |
 | `qualityLevel`     | number  | `6`         |
 | `compressionLevel` | number  | `2`         |

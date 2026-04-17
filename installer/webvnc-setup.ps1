@@ -156,10 +156,16 @@ function Get-WebVNC {
     Write-Header 'Step 2 - Download WebVNC'
 
     # If we are already running inside the repo, skip the download.
-    $localMarker = Join-Path (Split-Path -Parent $MyInvocation.ScriptName) '..' | Resolve-Path -ErrorAction SilentlyContinue
-    $localPkg    = if ($localMarker) { Join-Path $localMarker 'package.json' } else { '' }
+    $localPkg = ''
+    $scriptDir = if ($MyInvocation.ScriptName -and ($MyInvocation.ScriptName.Trim() -ne '')) {
+        Split-Path -Parent $MyInvocation.ScriptName
+    } else { '' }
+    if ($scriptDir -ne '') {
+        $localMarker = Join-Path $scriptDir '..' | Resolve-Path -ErrorAction SilentlyContinue
+        if ($localMarker) { $localPkg = Join-Path $localMarker 'package.json' }
+    }
 
-    if ((Test-Path $localPkg) -and ((Get-Content $localPkg -Raw) -match '"name"\s*:\s*"webvnc"')) {
+    if ($localPkg -ne '' -and (Test-Path $localPkg) -and ((Get-Content $localPkg -Raw) -match '"name"\s*:\s*"webvnc"')) {
         Write-OK 'Already running from inside the WebVNC repository. Skipping download.'
         return (Split-Path -Parent $localPkg)
     }
@@ -173,8 +179,21 @@ function Get-WebVNC {
         Remove-Item $InstallDir -Recurse -Force
     }
 
-    $zipPath = Join-Path $env:TEMP 'webvnc-download.zip'
-    $zipDir  = Join-Path $env:TEMP 'webvnc-extract'
+
+    # Ensure $env:TEMP is set and not empty
+    $tempDir = $env:TEMP
+    if ([string]::IsNullOrWhiteSpace($tempDir)) {
+        if ($env:TMP -and -not [string]::IsNullOrWhiteSpace($env:TMP)) {
+            $tempDir = $env:TMP
+        } elseif ($env:LOCALAPPDATA -and -not [string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
+            $tempDir = Join-Path $env:LOCALAPPDATA 'Temp'
+        } else {
+            Write-Fail 'TEMP directory environment variable is not set. Please set TEMP or TMP and re-run.'
+            Exit-WithPause
+        }
+    }
+    $zipPath = Join-Path $tempDir 'webvnc-download.zip'
+    $zipDir  = Join-Path $tempDir 'webvnc-extract'
 
     Write-Step "Downloading from $GITHUB_ZIP ..."
     try {
@@ -200,7 +219,10 @@ function Get-WebVNC {
     }
 
     Write-Step "Installing to $InstallDir ..."
-    New-Item -ItemType Directory -Path (Split-Path $InstallDir) -Force | Out-Null
+    $parentDir = Split-Path $InstallDir
+    if ($parentDir -and -not (Test-Path $parentDir)) {
+        New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+    }
     Move-Item $extracted.FullName $InstallDir
     Remove-Item $zipDir -Recurse -Force
 
@@ -458,6 +480,11 @@ try {
     Write-Host '  Where should WebVNC be installed?' -ForegroundColor White
     $installDir = Read-Value '  Install directory' $INSTALL_DIR_DEFAULT
     Write-Host ''
+
+    if ([string]::IsNullOrWhiteSpace($installDir)) {
+        Write-Fail 'Install directory cannot be empty. Please specify a valid directory.'
+        Exit-WithPause
+    }
 
     # Steps
     Install-NodeJs
