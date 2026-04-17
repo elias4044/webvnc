@@ -1,0 +1,35 @@
+services:
+  webvnc:
+    build: .
+    container_name: webvnc
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+      - "6080:6080"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3020
+      LOG_LEVEL: info
+      VNC_DEFAULT_HOST: ${VNC_DEFAULT_HOST:-localhost}
+      VNC_DEFAULT_PORT: ${VNC_DEFAULT_PORT:-5900}
+      VNC_DEFAULT_PATH: ${VNC_DEFAULT_PATH:-/}
+      VNC_DEFAULT_ENCRYPT: ${VNC_DEFAULT_ENCRYPT:-false}
+      WEBSOCKIFY_ENABLED: ${WEBSOCKIFY_ENABLED:-true}
+      WEBSOCKIFY_PORT: ${WEBSOCKIFY_PORT:-6080}
+      WEBSOCKIFY_HOST: ${WEBSOCKIFY_HOST:-0.0.0.0}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - webvnc-net
+
+networks:
+  webvnc-net:
+    driver: bridge
